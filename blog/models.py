@@ -1,10 +1,9 @@
 from django.db import models
-
-
-from accounts.models import User
-
+from django.contrib.auth.models import User
 
 # Create your models here.
+
+
 class Category(models.Model):
     name = models.CharField(max_length=200)
 
@@ -46,4 +45,4 @@ class Comment(models.Model):
         ordering = ['-created_date']
         
     def __str__(self):
-        return self.author
+        return str(self.author)

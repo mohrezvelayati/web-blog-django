@@ -14,6 +14,7 @@ class PostAdmin(admin.ModelAdmin):
 class CommentAdmin(admin.ModelAdmin):
     date_hierarchy = 'created_date'
     list_display = ('author', 'post', 'created_date')
+    list_filter = ('approved',)
 
 
 
