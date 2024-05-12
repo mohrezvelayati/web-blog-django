@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from datetime import datetime
 
 # Create your models here.
 
@@ -21,13 +22,13 @@ class Post(models.Model):
     author = models.CharField(max_length=200)
     content = models.TextField()
     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True)
-    published_date = models.DateTimeField()
+    published_date = models.DateTimeField(default=datetime.now())
     status = models.BooleanField(default=False)
 
 
-  
     def __str__(self):
         return self.title
+
 
 
 
@@ -38,7 +39,6 @@ class Comment(models.Model):
     message = models.TextField()
     approved = models.BooleanField()
     created_date = models.DateTimeField()
-
 
 
     class Meta:
