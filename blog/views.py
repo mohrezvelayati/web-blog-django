@@ -1,12 +1,13 @@
 from django.shortcuts import render
+from rest_framework import generics
+
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
-from rest_framework.response import Response
-from rest_framework import viewsets
+from django.contrib.auth.models import User
 
 
-from blog.serializers import PostSerializer
-from blog.models import Post
+from blog.serializers import PostSerializer, UserSerializer, CommentSerializer
+from blog.models import Post, Comment
 # Create your views here.
 
 # ####### first Fault #######
@@ -27,6 +28,19 @@ class PostListView(RetrieveUpdateDestroyAPIView):
         
 """
 
+class UserList(generics.ListCreateAPIView):
+    queryset = User.objects.all()
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    serializer_class = UserSerializer
+
+
+class UserDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = User.objects.all()
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    serializer_class = UserSerializer
+
+
+
 
 class PostListView(ListCreateAPIView):
     '''Getting list of posts and creating new posts'''
@@ -43,3 +57,8 @@ class PostDetailView(RetrieveUpdateDestroyAPIView):
     queryset = Post.objects.all()
 
 
+
+class CommentListView(ListCreateAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]

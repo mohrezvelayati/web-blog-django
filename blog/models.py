@@ -36,7 +36,7 @@ class Post(models.Model):
 class Comment(models.Model):
     author = models.OneToOneField(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    message = models.TextField()
+    message = models.TextField(blank=False, null=False)
     approved = models.BooleanField()
     created_date = models.DateTimeField()
 
