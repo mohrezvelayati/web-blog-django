@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 
 
-from blog.models import Category, Post, Comment, Like
+from blog.models import Category, Post, Comment, Like, BookMark
 
 
 
@@ -55,3 +55,11 @@ class LikesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Like
         fields = ['post', 'user', 'like']
+
+
+
+
+class BookMarkSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BookMark
+        fields = ['id', 'user', 'bookmarks']

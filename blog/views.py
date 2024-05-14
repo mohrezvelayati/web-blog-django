@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from rest_framework import generics
 from django.http import HttpResponse, HttpResponseNotFound
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, ListAPIView
@@ -9,8 +9,8 @@ from django.core.exceptions import ValidationError
 
 
 
-from blog.serializers import PostSerializer, UserSerializer, CommentSerializer, LikesSerializer
-from blog.models import Post, Comment, Like
+from blog.serializers import PostSerializer, UserSerializer, CommentSerializer, LikesSerializer, BookMarkSerializer
+from blog.models import Post, Comment, Like, BookMark
 # Create your views here.
 
 # ####### first Fault #####
@@ -124,4 +124,18 @@ class LikeView(ListCreateAPIView):
         return Like.objects.filter(like=user.is_authenticated, post=post)
     
 
-    
+
+
+class BookMarkView(ListCreateAPIView):
+    queryset = BookMark.objects.all()
+    serializer_class = BookMarkSerializer
+    permission_classes = [IsAuthenticated]
+
+
+    def bookmark_add(request, id):
+        post = get_object_or_404(Post, id=id)
+        if post.bookmarks.filter(id=request.user.id).exists():
+            post.bookmarks.remove(request.user)
+        else:
+            post.bookmarks.add(request.user)
+        return HttpResponse("bookmard added")

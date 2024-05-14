@@ -60,13 +60,15 @@ class Like(models.Model):
 
 
     def __str__(self):
-        return self.post
+        return str(self.post)
 
 
 
-class Save(models.Model):
+class BookMark(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    bookmarks = models.ManyToManyField(User, related_name='bookmarks', default=None, blank=True)
+
 
     def __str__(self):
         return self.post

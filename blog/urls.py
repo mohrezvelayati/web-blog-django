@@ -14,4 +14,6 @@ urlpatterns = [
     path('comment/', views.CommentListView.as_view(), name="comment-list"),
 
     path('post/<int:pk>/like/', views.LikeView.as_view(), name='likes'),
+
+     path('post/<int:pk>/bookmark/', views.BookMarkView.as_view(), name='bookmarks'),
 ]
