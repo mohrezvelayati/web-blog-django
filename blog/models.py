@@ -21,7 +21,6 @@ class Post(models.Model):
     title = models.CharField(max_length=200)
     author = models.CharField(max_length=200)
     content = models.TextField()
-    
     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True)
     published_date = models.DateTimeField(default=datetime.now())
     status = models.BooleanField(default=False)
@@ -41,7 +40,7 @@ class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     message = models.TextField(blank=False, null=False)
     approved = models.BooleanField()
-    created_date = models.DateTimeField()
+    created_date = models.DateTimeField(default=datetime.now())
 
 
     class Meta:
@@ -55,9 +54,9 @@ class Comment(models.Model):
 
 
 class Like(models.Model):
-    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    like = models.BooleanField(default=False)
+    like = models.BooleanField()
 
 
     def __str__(self):

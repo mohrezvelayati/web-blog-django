@@ -13,6 +13,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 
+
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
@@ -20,10 +21,19 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 
+
 class PostSerializer(serializers.ModelSerializer):
+
+    likes = serializers.SerializerMethodField(read_only=True)
+
+
     class Meta:
         model = Post
-        fields = ['title', 'author', 'content', 'published_date', 'status', 'category', 'comments_count']
+        fields = ['id', 'title', 'author', 'content', 'published_date', 'status', 'category', 'comments_count', 'likes']
+
+    def get_likes(self, post):
+        return Like.objects.filter(post=post).count()
+
 
 
 
@@ -32,21 +42,16 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
         fields = '__all__'
 
-    def get_comments(self, obj):
-        queryset = Comment.objects.filter(all).count()
-        return queryset
+    def get_comments(self, post):
+        return Comment.objects.filter(post=post).count()
+        # queryset = Comment.objects.filter(all).count()
+        # return queryset
+
 
 
 
 class LikesSerializer(serializers.ModelSerializer):
-    like = serializers.HyperlinkedRelatedField(
-        many=True,
-        read_only=True,
-        view_name='like-detail'
-    )
-
-
-    
+      
     class Meta:
         model = Like
-        fields = ['post_id', 'user_id', 'like']
+        fields = ['post', 'user', 'like']

@@ -5,6 +5,9 @@ from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIV
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly, IsAuthenticated
 from django.contrib.auth.models import User
 from rest_framework.response import Response 
+from django.core.exceptions import ValidationError
+
+
 
 from blog.serializers import PostSerializer, UserSerializer, CommentSerializer, LikesSerializer
 from blog.models import Post, Comment, Like
@@ -110,7 +113,15 @@ class CommentListView(ListCreateAPIView):
 
 
 
-class LikeView(ListAPIView):
+class LikeView(ListCreateAPIView):
     queryset = Like.objects.all()
     serializer_class = LikesSerializer
     permission_classes = [IsAuthenticated]
+            
+    def get_queryset(self):
+        user = self.request.user
+        post = Post.objects.get(pk=self.kwargs['pk'])
+        return Like.objects.filter(like=user.is_authenticated, post=post)
+    
+
+    
