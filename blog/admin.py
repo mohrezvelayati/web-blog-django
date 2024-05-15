@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 
-from blog.models import Post, Category, Comment, Like
+from blog.models import Post, Category, Comment, Like, BookMark
 
 # Register your models here.
 class PostAdmin(admin.ModelAdmin):
@@ -16,11 +16,18 @@ class CommentAdmin(admin.ModelAdmin):
     list_display = ('author', 'post', 'created_date')
     list_filter = ('approved',)
 
+class LikeAdmin(admin.ModelAdmin):
+    list_display = ('user', 'post')
 
 
+
+
+class BookmarkAdmin(admin.ModelAdmin):
+    list_display = ('user', 'post')
 
 # Register models in admin
 admin.site.register(Post, PostAdmin)
 admin.site.register(Category)
 admin.site.register(Comment,CommentAdmin)
-admin.site.register(Like)
+admin.site.register(Like, LikeAdmin)
+admin.site.register(BookMark, BookmarkAdmin)

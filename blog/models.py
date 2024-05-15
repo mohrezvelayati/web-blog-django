@@ -32,6 +32,10 @@ class Post(models.Model):
     def comments_count(self):
         comments = Comment.objects.filter(post__pk=self.pk)
         return len(comments)
+    
+    def bookmark_count(self):
+        bookmark = BookMark.objects.filter(post__pk=self.pk)
+        return len(bookmark)
 
 
 
@@ -39,6 +43,7 @@ class Comment(models.Model):
     author = models.ForeignKey(User, on_delete=models.PROTECT)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     message = models.TextField(blank=False, null=False)
+    email = models.EmailField()
     approved = models.BooleanField()
     created_date = models.DateTimeField(default=datetime.now())
 
@@ -56,7 +61,7 @@ class Comment(models.Model):
 class Like(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    like = models.BooleanField()
+
 
 
     def __str__(self):
@@ -67,9 +72,10 @@ class Like(models.Model):
 class BookMark(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    bookmarks = models.ManyToManyField(User, related_name='bookmarks', default=None, blank=True)
 
 
     def __str__(self):
-        return self.post
+        return str(self.post)
 
+    class Meta:
+        verbose_name = "BookMark"

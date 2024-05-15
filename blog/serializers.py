@@ -29,7 +29,7 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ['id', 'title', 'author', 'content', 'published_date', 'status', 'category', 'comments_count', 'likes']
+        fields = ['id', 'title', 'author', 'content', 'published_date', 'status', 'category', 'comments_count', 'likes', 'bookmark_count']
 
     def get_likes(self, post):
         return Like.objects.filter(post=post).count()
@@ -44,8 +44,6 @@ class CommentSerializer(serializers.ModelSerializer):
 
     def get_comments(self, post):
         return Comment.objects.filter(post=post).count()
-        # queryset = Comment.objects.filter(all).count()
-        # return queryset
 
 
 
@@ -54,7 +52,7 @@ class LikesSerializer(serializers.ModelSerializer):
       
     class Meta:
         model = Like
-        fields = ['post', 'user', 'like']
+        fields = ['post', 'user']
 
 
 
@@ -62,4 +60,4 @@ class LikesSerializer(serializers.ModelSerializer):
 class BookMarkSerializer(serializers.ModelSerializer):
     class Meta:
         model = BookMark
-        fields = ['id', 'user', 'bookmarks']
+        fields = ['id', 'user']
