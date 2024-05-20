@@ -94,3 +94,4 @@ class BookMark(models.Model):
 
     class Meta:
         verbose_name = "BookMark"
+
