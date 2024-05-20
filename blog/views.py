@@ -6,9 +6,8 @@ from rest_framework.response import Response
 
 
 
-
-from blog.serializers import PostSerializer, UserSerializer, CommentSerializer, LikesSerializer, BookMarkSerializer
-from blog.models import Post, Comment, Like, BookMark
+from blog.serializers import PostSerializer, UserSerializer, CommentSerializer, LikesSerializer, BookMarkSerializer,CommentReplySerializer
+from blog.models import Post, Comment, Like, BookMark, CommentReply
 
 
 
@@ -54,6 +53,16 @@ class CommentListView(ListCreateAPIView):
         user = self.request.user
         post = Post.objects.get(pk=self.kwargs['pk'])
         return Comment.objects.filter(message=user.is_authenticated, post=post)
+
+
+
+class CommentReplyView(ListCreateAPIView):
+    queryset = CommentReply.objects.all()
+    serializer_class = CommentReplySerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    
+
 
 
 class LikeView(ListCreateAPIView):

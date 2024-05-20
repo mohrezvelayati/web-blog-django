@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 
 
-from blog.models import Category, Post, Comment, Like, BookMark
+from blog.models import Category, Post, Comment, CommentReply, Like, BookMark
 
 
 
@@ -44,6 +44,16 @@ class CommentSerializer(serializers.ModelSerializer):
 
     def get_comments(self, post):
         return Comment.objects.filter(post=post).count()
+
+
+
+
+class CommentReplySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CommentReply
+        fields = '__all__'
+
+    
 
 
 

@@ -52,7 +52,22 @@ class Comment(models.Model):
         ordering = ['-created_date']
         
     def __str__(self):
-        return str(self.author)
+        return str(self.message)
+
+
+
+class CommentReply(models.Model):
+    author = models.ForeignKey(User, on_delete=models.PROTECT)
+    reply_to = models.ForeignKey(Comment, on_delete=models.CASCADE)
+    reply_message = models.TextField(blank=False, null=False)
+    approved = models.BooleanField()
+    created_date = models.DateTimeField(default=datetime.now())
+    
+
+
+    def __str__(self):
+        return f"Reply to: {self.reply_to}"
+
 
 
 
