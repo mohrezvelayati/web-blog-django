@@ -1,5 +1,5 @@
 from rest_framework import generics
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, CreateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly, IsAuthenticated
 from django.contrib.auth.models import User
 from rest_framework.response import Response 
@@ -14,12 +14,22 @@ from blog.models import Post, Comment, Like, BookMark, CommentReply
 # Create your views here.
 
 class UserList(generics.ListCreateAPIView):
+    """
+
+        return users list  ///  اطلاعات کاربران را نمایش میدهد
+
+    """
     queryset = User.objects.all()
     permission_classes = [IsAuthenticatedOrReadOnly]
     serializer_class = UserSerializer
 
 
 class UserDetail(generics.RetrieveUpdateDestroyAPIView):
+    """
+
+        return specific user information  ///  اطلاعات یک کاربر خاص را نمایش میدهد
+
+    """
     queryset = User.objects.all()
     permission_classes = [IsAuthenticatedOrReadOnly]
     serializer_class = UserSerializer
@@ -28,7 +38,11 @@ class UserDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 class PostListView(ListCreateAPIView):
-    '''Getting list of posts and creating new posts'''
+    '''
+    
+        Getting list of posts and creating new posts  ///  نمایش لیت پست ها و ساخت پست
+    
+    '''
     permission_classes = [AllowAny]
     serializer_class = PostSerializer
     queryset = Post.objects.all()
@@ -36,27 +50,41 @@ class PostListView(ListCreateAPIView):
 
 
 class PostDetailView(RetrieveUpdateDestroyAPIView):
-    '''Getting detail of the post and edit + removing it'''
+    '''
+    
+        Getting detail of the post and edit + removing it  ///  نمایش جزئیات ادیت و حذف پست
+    
+    '''
     permission_classes = [AllowAny]
     serializer_class = PostSerializer
     queryset = Post.objects.all()
 
 
 
-class CommentListView(ListCreateAPIView):
+class CommentListView(generics.ListCreateAPIView):
+    '''
+    
+        return comments of a post  ///  نمایش کامنت های پست
+    
+    '''
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
 
-    def get_queryset(self):
-        user = self.request.user
-        post = Post.objects.get(pk=self.kwargs['pk'])
-        return Comment.objects.filter(message=user.is_authenticated, post=post)
+    # def get_queryset(self):
+    #     user = self.request.user
+    #     post = Post.objects.get(pk=self.kwargs['pk'])
+    #     return Comment.objects.filter(message=user.is_authenticated, post=post)
 
 
 
 class CommentReplyView(ListCreateAPIView):
+    '''
+
+        Replying to a comment  //  ریپلای کردن یک کامنت
+    
+    '''
     queryset = CommentReply.objects.all()
     serializer_class = CommentReplySerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
@@ -66,6 +94,11 @@ class CommentReplyView(ListCreateAPIView):
 
 
 class LikeView(ListCreateAPIView):
+    '''
+
+        Liking a post  //  لایک پست
+    
+    '''
     queryset = Like.objects.all()
     serializer_class = LikesSerializer
     permission_classes = [IsAuthenticated]
@@ -84,7 +117,12 @@ class LikeView(ListCreateAPIView):
 
 
 
-class BookMarkView(ListCreateAPIView):
+class BookMarkView(CreateAPIView):
+    '''
+    
+        Bookmark a post  //  بوکمارک پست
+    
+    '''
     queryset = BookMark.objects.all()
     serializer_class = BookMarkSerializer
     permission_classes = [IsAuthenticated]
