@@ -1,4 +1,4 @@
-from django.urls import path, include
+from django.urls import path
 
 from blog import views
 
@@ -6,7 +6,6 @@ urlpatterns = [
 
     path('user/', views.UserList.as_view()),
     path('user/<int:pk>/', views.UserDetail.as_view()),
-
 
     path('post/', views.PostListView.as_view(), name="post-list"),
     path('post/<int:pk>/', views.PostDetailView.as_view(), name="post-detail"),
@@ -16,5 +15,5 @@ urlpatterns = [
 
     path('post/<int:pk>/like/', views.LikeView.as_view(), name='likes'),
 
-     path('post/<int:pk>/bookmark/', views.BookMarkView.as_view(), name='bookmarks'),
+    path('post/<int:pk>/bookmark/', views.BookMarkView.as_view(), name='bookmarks'),
 ]
