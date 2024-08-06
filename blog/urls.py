@@ -9,6 +9,7 @@ urlpatterns = [
 
     path('post/', views.PostListView.as_view(), name="post-list"),
     path('post/<int:pk>/', views.PostDetailView.as_view(), name="post-detail"),
+    # path("post/<slug:slug>/", views.PostDetailView.as_view(), name="post-detail"),
 
     path('post/<int:pk>/comment/', views.CommentListView.as_view(), name="comment-list"),
     path('post/<int:pk>/comment/reply/', views.CommentReplyView.as_view(), name="comment-reply"),

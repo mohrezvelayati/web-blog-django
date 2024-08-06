@@ -9,6 +9,7 @@ class PostAdmin(admin.ModelAdmin):
     list_filter = ('status', 'author')
     ordering = ['published_date']
     search_fields = ['title']
+    prepopulated_fields = {"slug": ("title",)}
 
 
 class CommentAdmin(admin.ModelAdmin):

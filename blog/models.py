@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from datetime import datetime
-
+from django.urls import reverse
 
 # Create your models here.
 
@@ -18,14 +18,18 @@ class Category(models.Model):
 
 class Post(models.Model):
     title = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=200, blank=True, null=True)
     author = models.CharField(max_length=200)
     content = models.TextField()
     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True)
     published_date = models.DateTimeField(default=datetime.now())
-    status = models.BooleanField(default=False)
+    status = models.BooleanField(default=False)  # should define
 
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        return reverse("post-detail", kwargs={"slug": str(self.slug)})
 
     def comments_count(self):
         comments = Comment.objects.filter(post__pk=self.pk)
@@ -37,8 +41,7 @@ class Post(models.Model):
 
 
 class Comment(models.Model):
-    objects = None
-    author = models.ForeignKey(User, on_delete=models.PROTECT)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     message = models.TextField(blank=False, null=False)
     email = models.EmailField()
@@ -48,8 +51,11 @@ class Comment(models.Model):
     class Meta:
         ordering = ['-created_date']
 
+    # def __str__(self):
+    #     return str(self.message)
+
     def __str__(self):
-        return str(self.message)
+        return "Comment {} by {}".format(self.message, self.author)
 
 
 class CommentReply(models.Model):
