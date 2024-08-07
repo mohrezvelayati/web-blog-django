@@ -1,12 +1,14 @@
 from rest_framework import generics
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, CreateAPIView
+from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView, CreateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly, IsAuthenticated
 from django.contrib.auth.models import User
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from blog.serializers import PostSerializer, UserSerializer, CommentSerializer, LikesSerializer, BookMarkSerializer, \
+from blog.serializers import PostCreateUpdateSerializer, PostSerializer, PostDetailSerializer, UserSerializer, CommentSerializer, LikesSerializer, BookMarkSerializer, \
     CommentReplySerializer
 from blog.models import Post, Comment, Like, BookMark, CommentReply
+from .pagination import PostLimitOffsetPagination
 
 
 # Create your views here.
@@ -33,18 +35,34 @@ class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = UserSerializer
 
 
+class PostCreateView(APIView):
+    """
+    post:
+        Creates a new post instance. Returns created post data
 
-
-class PostListView(ListCreateAPIView):
     """
 
-        Getting list of posts and creating new posts  ///  نمایش لیت پست ها و ساخت پست
+    queryset = Post.objects.all()
+    serializer_class = PostCreateUpdateSerializer
+    permission_classes = [AllowAny]
 
+    def post(self, request):
+        serializer = PostCreateUpdateSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data, status=200)
+        else:
+            return Response({"errors": serializer.errors}, status=400)
+
+class PostListView(ListAPIView):
+    """
+    get:
+        Returns a list of all existing posts
     """
     permission_classes = [AllowAny]
     serializer_class = PostSerializer
     queryset = Post.objects.all()
-
+    pagination_class = PostLimitOffsetPagination
 
 class PostDetailView(RetrieveUpdateDestroyAPIView):
     """
@@ -53,7 +71,7 @@ class PostDetailView(RetrieveUpdateDestroyAPIView):
 
     """
     permission_classes = [AllowAny]
-    serializer_class = PostSerializer
+    serializer_class = PostDetailSerializer
     queryset = Post.objects.all()
 
 
