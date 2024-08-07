@@ -33,34 +33,36 @@ class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = UserSerializer
 
 
+
+
 class PostListView(ListCreateAPIView):
-    '''
-    
+    """
+
         Getting list of posts and creating new posts  ///  نمایش لیت پست ها و ساخت پست
-    
-    '''
+
+    """
     permission_classes = [AllowAny]
     serializer_class = PostSerializer
     queryset = Post.objects.all()
 
 
 class PostDetailView(RetrieveUpdateDestroyAPIView):
-    '''
-    
+    """
+
         Getting detail of the post and edit + removing it  ///  نمایش جزئیات ادیت و حذف پست
-    
-    '''
+
+    """
     permission_classes = [AllowAny]
     serializer_class = PostSerializer
     queryset = Post.objects.all()
 
 
 class CommentListView(generics.ListCreateAPIView):
-    '''
+    """
 
         return comments of a post  ///  نمایش کامنت های پست
 
-    '''
+    """
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
@@ -72,22 +74,22 @@ class CommentListView(generics.ListCreateAPIView):
 
 
 class CommentReplyView(ListCreateAPIView):
-    '''
+    """
 
         Replying to a comment  //  ریپلای کردن یک کامنت
-    
-    '''
+
+    """
     queryset = CommentReply.objects.all()
     serializer_class = CommentReplySerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
 
 class LikeView(ListCreateAPIView):
-    '''
+    """
 
         Liking a post  //  لایک پست
-    
-    '''
+
+    """
     queryset = Like.objects.all()
     serializer_class = LikesSerializer
     permission_classes = [IsAuthenticated]
@@ -105,16 +107,16 @@ class LikeView(ListCreateAPIView):
 
 
 class BookMarkView(CreateAPIView):
-    '''
-    
+    """
+
         Bookmark a post  //  بوکمارک پست
-    
-    '''
+
+    """
     queryset = BookMark.objects.all()
     serializer_class = BookMarkSerializer
     permission_classes = [IsAuthenticated]
 
-    def get(self, request, **kwargs):
+    def get(self):
         user = self.request.user
         post = Post.objects.get(pk=self.kwargs['pk'])
         saved = BookMark.objects.filter(user=user.is_authenticated, post=post)

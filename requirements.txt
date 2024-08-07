@@ -7,3 +7,6 @@ tzdata==2024.1
 
 drf-yasg[validation]
 django-rest-swagger
+
+
+Pillow

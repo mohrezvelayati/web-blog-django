@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from datetime import datetime
-from django.urls import reverse
+
 
 # Create your models here.
 
@@ -19,8 +19,9 @@ class Category(models.Model):
 class Post(models.Model):
     title = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200, blank=True, null=True)
-    author = models.CharField(max_length=200)
+    author = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     content = models.TextField()
+    image = models.ImageField(upload_to='media', blank=True, null=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True)
     published_date = models.DateTimeField(default=datetime.now())
     status = models.BooleanField(default=False)  # should define
@@ -28,8 +29,8 @@ class Post(models.Model):
     def __str__(self):
         return self.title
 
-    def get_absolute_url(self):
-        return reverse("post-detail", kwargs={"slug": str(self.slug)})
+    class Meta:
+        ordering = ["published_date"]
 
     def comments_count(self):
         comments = Comment.objects.filter(post__pk=self.pk)
