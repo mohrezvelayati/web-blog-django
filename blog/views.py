@@ -1,13 +1,17 @@
 from rest_framework import generics
-from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView, CreateAPIView
+from django.shortcuts import get_object_or_404
+from rest_framework.generics import ListAPIView, RetrieveUpdateDestroyAPIView, CreateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly, IsAuthenticated
 from django.contrib.auth.models import User
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from blog.serializers import PostCreateUpdateSerializer, PostSerializer, PostDetailSerializer, UserSerializer, CommentSerializer, LikesSerializer, BookMarkSerializer, \
-    CommentReplySerializer
-from blog.models import Post, Comment, Like, BookMark, CommentReply
+
+from blog.serializers import (PostCreateUpdateSerializer, PostSerializer,
+                              PostDetailSerializer, UserSerializer, CommentSerializer,
+                              LikesSerializer, BookMarkSerializer
+                              )
+from blog.models import Post, Comment, Like, BookMark
 from .pagination import PostLimitOffsetPagination
 
 
@@ -15,8 +19,11 @@ from .pagination import PostLimitOffsetPagination
 
 class UserList(generics.ListCreateAPIView):
     """
+    get:
+        Returns the list of users
 
-        return users list  ///  اطلاعات کاربران را نمایش میدهد
+    post:
+        Creates a new user. Returns created post data
 
     """
     queryset = User.objects.all()
@@ -26,8 +33,18 @@ class UserList(generics.ListCreateAPIView):
 
 class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     """
+    get:
+        Returns the list of users
 
-        return specific user information  ///  اطلاعات یک کاربر خاص را نمایش میدهد
+    put:
+        Updates user data
+
+    patch:
+        Updates an existing user
+
+    delete:
+        Delete an existing user
+
 
     """
     queryset = User.objects.all()
@@ -39,7 +56,6 @@ class PostCreateView(APIView):
     """
     post:
         Creates a new post instance. Returns created post data
-
     """
 
     queryset = Post.objects.all()
@@ -54,6 +70,7 @@ class PostCreateView(APIView):
         else:
             return Response({"errors": serializer.errors}, status=400)
 
+
 class PostListView(ListAPIView):
     """
     get:
@@ -64,10 +81,17 @@ class PostListView(ListAPIView):
     queryset = Post.objects.all()
     pagination_class = PostLimitOffsetPagination
 
+
 class PostDetailView(RetrieveUpdateDestroyAPIView):
     """
+    get:
+        Returns the details of a post instance. Searches post using slug field.
 
-        Getting detail of the post and edit + removing it  ///  نمایش جزئیات ادیت و حذف پست
+    put:
+        Updates an existing post. Returns updated post data
+
+    delete:
+        Delete an existing post
 
     """
     permission_classes = [AllowAny]
@@ -75,72 +99,106 @@ class PostDetailView(RetrieveUpdateDestroyAPIView):
     queryset = Post.objects.all()
 
 
-class CommentListView(generics.ListCreateAPIView):
+class CreateCommentView(CreateAPIView):
     """
+     post:
+         Create a comment. Returns created comment data
 
-        return comments of a post  ///  نمایش کامنت های پست
+     """
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+
+class CommentListView(ListAPIView):
+    """
+    get:
+        Returns the list of comments on a particular post
 
     """
-    queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-    # def get_queryset(self):
-    #     user = self.request.user
-    #     post = Post.objects.get(pk=self.kwargs['pk'])
-    #     return Comment.objects.filter(message=user.is_authenticated, post=post)
+    def get_queryset(self):
+        post_id = self.kwargs['pk']
+        return Comment.objects.filter(post_id=post_id)
 
 
-class CommentReplyView(ListCreateAPIView):
+class CommentDetailView(RetrieveUpdateDestroyAPIView):
     """
+     get:
+         Returns the details of a comment.
 
-        Replying to a comment  //  ریپلای کردن یک کامنت
+     put:
+         Updates an existing comment. Returns updated comment data
 
-    """
-    queryset = CommentReply.objects.all()
-    serializer_class = CommentReplySerializer
+     delete:
+         Delete an existing comment
+
+     """
+
+    def get_queryset(self):
+        post_id = self.kwargs['post_id']
+        return Comment.objects.filter(post_id=post_id)
+
+    serializer_class = CommentSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+    lookup_fields = ["id"]
+
+    def get_object(self):
+        queryset = self.get_queryset()
+        return get_object_or_404(queryset, pk=self.kwargs['id'])
 
 
-class LikeView(ListCreateAPIView):
+class LikeView(CreateAPIView):
     """
+     post:
+         Like a specific post
 
-        Liking a post  //  لایک پست
+     """
 
-    """
-    queryset = Like.objects.all()
     serializer_class = LikesSerializer
     permission_classes = [IsAuthenticated]
 
-    def get(self, request, **kwargs):
-        user = self.request.user
-        post = Post.objects.get(pk=self.kwargs['pk'])
-        fav = Like.objects.filter(user=user.is_authenticated, post=post)
-        if len(fav) > 0:
-            return Response({"error": "You have alredy Liked this post"})
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        post = Post.objects.get(pk=kwargs['pk'])
+        saved = Like.objects.filter(user=user, post=post)
+        if saved.exists():
+            return Response({"error": "You have already liked this post"})
         else:
-            like = Like(user=user, post=post)
-            like.save()
-            return Response({"seccess": "You successfully liked this post :)"})
+            bookmark = BookMark(user=user, post=post)
+            bookmark.save()
+            return Response({"success": "This post successfully liked for you :)"})
+
+    def get_queryset(self):
+        post_id = self.kwargs['post_id']
+        return Like.objects.filter(post_id=post_id)
 
 
 class BookMarkView(CreateAPIView):
     """
+     post:
+         Bookmark a specific post
 
-        Bookmark a post  //  بوکمارک پست
+     """
 
-    """
-    queryset = BookMark.objects.all()
     serializer_class = BookMarkSerializer
     permission_classes = [IsAuthenticated]
 
-    def get(self):
-        user = self.request.user
-        post = Post.objects.get(pk=self.kwargs['pk'])
-        saved = BookMark.objects.filter(user=user.is_authenticated, post=post)
-        if len(saved) > 0:
-            return Response({"error": "You have alredy Bookmarked this post"})
+    def get_queryset(self):
+        post_id = self.kwargs['post_id']
+        return BookMark.objects.filter(post_id=post_id)
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        post = Post.objects.get(pk=kwargs['pk'])
+        saved = BookMark.objects.filter(user=user, post=post)
+        if saved.exists():
+            return Response({"error": "You have already bookmarked this post"})
         else:
-            like = BookMark(user=user, post=post)
-            like.save()
-            return Response({"seccess": "This post successfuly bookmarked for you :)"})
+            bookmark = BookMark(user=user, post=post)
+            bookmark.save()
+            return Response({"success": "This post successfully bookmarked for you :)"})

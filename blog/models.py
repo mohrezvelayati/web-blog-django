@@ -45,6 +45,7 @@ class Comment(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     message = models.TextField(blank=False, null=False)
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True, related_name='replies')
     email = models.EmailField()
     approved = models.BooleanField()
     created_date = models.DateTimeField(default=datetime.now())
@@ -52,22 +53,8 @@ class Comment(models.Model):
     class Meta:
         ordering = ['-created_date']
 
-    # def __str__(self):
-    #     return str(self.message)
-
     def __str__(self):
-        return "Comment {} by {}".format(self.message, self.author)
-
-
-class CommentReply(models.Model):
-    author = models.ForeignKey(User, on_delete=models.PROTECT)
-    reply_to = models.ForeignKey(Comment, on_delete=models.CASCADE)
-    reply_message = models.TextField(blank=False, null=False)
-    approved = models.BooleanField()
-    created_date = models.DateTimeField(default=datetime.now())
-
-    def __str__(self):
-        return f"Reply to: {self.reply_to}"
+        return f'Comment by {self.author} is {self.message}'
 
 
 class Like(models.Model):
@@ -79,7 +66,6 @@ class Like(models.Model):
 
 
 class BookMark(models.Model):
-    objects = None
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
 
